@@ -1,65 +1,35 @@
 package ApiwizAssignment.Assignment.Entities;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
-import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.Collection;
-import java.util.Collections;
+import jakarta.validation.constraints.Email;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Builder
-public class User implements UserDetails {
-
-    @Transient
-    public static final String sequence_num= "users_Sequence";
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class User {
     @Id
-    private int id;
+    private String id;
     private String first_name;
     private String last_name;
+    @Email
     private String email;
-    private String phone_number;
+    private String phone_no;
     private String password;
-    private UserRole userRole;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
-        return Collections.singletonList(authority);
-    }
+    @DBRef
+    private Set<Role> roles = new HashSet<>();
 
-    @Override
-    public String getUsername() {
-        return this.getEmail();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public User(String email, String password) {
+        this.email= email;
+        this.password= password;
     }
 }

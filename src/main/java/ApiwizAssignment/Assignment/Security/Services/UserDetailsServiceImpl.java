@@ -1,24 +1,26 @@
-package ApiwizAssignment.Assignment.Config;
+package ApiwizAssignment.Assignment.Security.Services;
 
 import ApiwizAssignment.Assignment.Entities.User;
 import ApiwizAssignment.Assignment.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CustomUserDetailService implements UserDetailsService {
-
+public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //loading user from database by username
-        User user= this.userRepository.findByEmail(username).orElseThrow(()->new ResourceNotFoundException("User","email: "+username,0));
-        return user;
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+
+        return UserDetailsImpl.build(user);
     }
+
 }
